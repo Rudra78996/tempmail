@@ -1,5 +1,6 @@
 import express from "express";
 import Inbox from "../models/Inbox.js";
+import crypto from "crypto";
 
 const router  = express.Router();
 
@@ -19,6 +20,18 @@ router.post("/receive", async (req, res)=>{
     });
     await inbox.save();
     res.status(200).send("Email stored");
+});
+
+function generateRandomId(length=6) {
+    return crypto.randomBytes(Math.ceil(length / 2)).toString("hex").slice(0, length);
+}
+
+router.post("/create-inbox", async (req, res) => {
+  const emailId = generateRandomId();
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+  await Inbox.create({ emailId, expiresAt, emails: [] });
+  res.json({ address: `${emailId}@mg.tempmail.today` });
 });
 
 export default router
