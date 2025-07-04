@@ -31,7 +31,7 @@ router.post("/create-inbox", async (req, res) => {
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
   await Inbox.create({ emailId, expiresAt, emails: [] });
-  res.json({ address: `${emailId}@mg.tempmail.today` });
+  res.json({ address: `${emailId}@mg.tempmails.today` });
 });
 
 export default router
