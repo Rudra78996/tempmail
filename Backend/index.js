@@ -5,19 +5,29 @@ import cors from "cors";
 import 'dotenv/config';
 import morgan from "morgan";
 import http from "http";
+import { setSocketIO } from "./routes/email.js";
 
 import { Server } from "socket.io";
 
 const app = express();
 const server = http.createServer(app);
+
 const io = new Server(server, {
   cors:{
     origin : process.env.FRONTEND_URL
   }
 });
 
+setSocketIO(io);
+
 io.on("connection", (socket)=>{
   console.log("a user is connected"+socket.id);
+
+  socket.on("join_inbox", (emailId)=> {
+    console.log(`Socket ${socket.id} joined inbox ${emailId}`);
+    socket.join(emailId);
+  });
+
   socket.on("disconnect", ()=>{
     console.log("A user disconnected");
   })

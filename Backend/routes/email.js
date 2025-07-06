@@ -2,6 +2,11 @@ import express from "express";
 import Inbox from "../models/Inbox.js";
 import crypto from "crypto";
 import { rateLimit } from "express-rate-limit";
+export let io;
+
+export function setSocketIO(socketInstance) {
+    io = socketInstance;
+}
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, 
@@ -19,14 +24,18 @@ router.post("/receive", async (req, res)=>{
         console.log("Expired or invalid inbox: ", emailId);
         return res.status(406).send("Inbox expired");
     }
-    inbox.emails.push({
+    const emailContent = {
         from : req.body.sender  || "",
         subject:req.body.subject || "",
         text: req.body["body-plain"] || "",
         html: req.body["body-html"] || "",
         receivedAt: new Date(),
-    });
+    }
+    inbox.emails.push(emailContent);
     await inbox.save();
+    io?.to(emailId).emit("new_email", {
+        emailContent
+    })
     res.status(200).send("Email stored");
 });
 

@@ -54,8 +54,7 @@ export default function App() {
         body: JSON.stringify({ email: inboxEmail }),
       });
       const data = await res.json();
-      console.log(data.data.emails);
-      
+      console.log(data.data); 
       if(data.success && data.data.emails) setMessages(data.data.emails);
     } catch (err) {
       console.log(err);
@@ -70,6 +69,18 @@ export default function App() {
       checkEmailValidity(localStorageEmail);
     }
   }, []);
+
+  useEffect(()=>{
+    if(!email || email==="Generating...") return;
+    socket.emit("join_inbox", email.split("@")[0]);
+
+    socket.on("new_email", (data)=>{
+      console.log("Received new email", data);
+    });
+    return () => {
+      socket.off("new_email")
+    }
+  }, [email]);
 
   useEffect(() => {
     fetchInbox(email);
