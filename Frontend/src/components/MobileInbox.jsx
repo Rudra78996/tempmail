@@ -6,7 +6,7 @@ export const MobileInbox = ({ messages }) => {
   
   const handleClickMessage = (e) => {
     const messageId = e.currentTarget.id;
-    setCurrentMessage(messages.filter((message) => message.id === messageId));
+    setCurrentMessage(messages.filter((message) => message._id === messageId));
   };
   
   const onClickBackHandler = () => {
@@ -23,10 +23,10 @@ export const MobileInbox = ({ messages }) => {
           <div className="flex-1 overflow-y-auto">
             {messages.map((message) => (
               <div
-                key={message.id}
+                key={message._id}
                 className="p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
                 onClick={handleClickMessage}
-                id={message.id}
+                id={message._id}
               >
                 <div className="flex justify-between items-start mb-1">
                   <span className="font-medium text-gray-900 truncate">{message.from}</span>
@@ -56,7 +56,7 @@ export const MobileInbox = ({ messages }) => {
           
           <div className="flex-1 overflow-y-auto p-4">
             {currentMessage.map((message) => (
-              <div key={message.id}>
+              <div key={message._id}>
                 <div className="mb-4">
                   <p className="text-gray-700 mb-1">
                     <span className="font-semibold">From:</span> {message.from}

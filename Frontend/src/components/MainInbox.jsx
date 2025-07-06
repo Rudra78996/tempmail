@@ -5,7 +5,7 @@ export const MainInbox = ({messages}) => {
   const [currentMessage, setCurrentMessage] = useState([]);
   const handleClickMessage = (e) => {
     const messageId = e.currentTarget.id;
-    setCurrentMessage(messages.filter((message) => message.id === messageId));
+    setCurrentMessage(messages.filter((message) => message._id === messageId));
   };
 
   return (
@@ -18,12 +18,12 @@ export const MainInbox = ({messages}) => {
         <div className="flex-1 overflow-y-auto">
           {messages.map((message) => (
             <div
-              key={message.id}
+              key={message._id}
               className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors ${
-                currentMessage[0]?.id === message.id ? 'bg-blue-50' : 'bg-white'
+                currentMessage[0]?.id === message._id ? 'bg-blue-50' : 'bg-white'
               }`}
               onClick={handleClickMessage}
-              id={message.id}
+              id={message._id}
             >
               <div className="flex justify-between items-start mb-1">
                 <span className="font-medium text-gray-900 truncate">{message.from}</span>
@@ -44,7 +44,7 @@ export const MainInbox = ({messages}) => {
           </div>
         ) : (
           currentMessage.map((message) => (
-            <div key={message.id} className="flex-1 overflow-y-auto p-6">
+            <div key={message._id} className="flex-1 overflow-y-auto p-6">
               <div className="mb-6">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">{message.subject}</h2>
                 <div className="flex justify-between items-center mb-4">

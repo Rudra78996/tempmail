@@ -20,10 +20,10 @@ router.post("/receive", async (req, res)=>{
         return res.status(406).send("Inbox expired");
     }
     inbox.emails.push({
-        from : req.body.sender,
-        subject:req.body.subject,
-        text: req.body["body-plain"],
-        html: req.body["body-html"],
+        from : req.body.sender  || "",
+        subject:req.body.subject || "",
+        text: req.body["body-plain"] || "",
+        html: req.body["body-html"] || "",
         receivedAt: new Date(),
     });
     await inbox.save();
@@ -37,6 +37,7 @@ router.post("/inbox", async (req, res) => {
     try {
         const inbox = await Inbox.findOne({emailId});
         if(!inbox) return res.json({success : false});
+        // console.log(inbox.reverse());
         return res.json({success: true, data : inbox});
     } catch(err) {
         return res.json({success: false});

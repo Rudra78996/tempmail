@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Inbox } from "./components/Inbox";
+import {io} from "socket.io-client"
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+const socket = io(BACKEND_URL);
 
 export default function App() {
   const [email, setEmail] = useState("Generating...");
@@ -52,7 +54,9 @@ export default function App() {
         body: JSON.stringify({ email: inboxEmail }),
       });
       const data = await res.json();
-      console.log(data);
+      console.log(data.data.emails);
+      
+      if(data.success && data.data.emails) setMessages(data.data.emails);
     } catch (err) {
       console.log(err);
     }
