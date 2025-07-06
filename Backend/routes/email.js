@@ -33,9 +33,10 @@ router.post("/receive", async (req, res)=>{
     }
     inbox.emails.push(emailContent);
     await inbox.save();
+    const latestEmail = inbox.emails.at(-1);
     io?.to(emailId).emit("new_email", {
-        emailContent
-    })
+        email: latestEmail,
+    });
     res.status(200).send("Email stored");
 });
 
