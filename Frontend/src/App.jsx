@@ -76,6 +76,7 @@ export default function App() {
 
     socket.on("new_email", (data)=>{
       console.log("Received new email", data);
+      setMessages((prev) => [data.email, ...prev]);
     });
     return () => {
       socket.off("new_email")
