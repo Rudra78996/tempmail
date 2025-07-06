@@ -1,6 +1,14 @@
 import express from "express";
 import Inbox from "../models/Inbox.js";
 import crypto from "crypto";
+import { rateLimit } from "express-rate-limit";
+
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, 
+    limit: 4, 
+    standardHeaders: 'draft-8', 
+    legacyHeaders: false, 
+});
 
 const router  = express.Router();
 
@@ -22,11 +30,37 @@ router.post("/receive", async (req, res)=>{
     res.status(200).send("Email stored");
 });
 
+router.post("/inbox", async (req, res) => {
+    const { email } = req.body;
+    if(!email) return res.json({success : false});
+    const emailId = email.split("@")[0];
+    try {
+        const inbox = await Inbox.findOne({emailId});
+        if(!inbox) return res.json({success : false});
+        return res.json({success: true, data : inbox});
+    } catch(err) {
+        return res.json({success: false});
+    }
+});
+
+router.post("/isValid", async (req, res)=> {
+    const { email } = req.body;
+    if(!email) return res.json({isValid : false});
+    const emailId = email.split("@")[0];
+    if(!emailId) return res.json({isValid : false});
+    const inbox = await Inbox.findOne({emailId});
+    if(!inbox || new Date() > inbox.expiresAt) {
+        return res.json({isValid:false});
+    }
+    return res.json({isValid:true});
+});
+
 function generateRandomId(length=6) {
     return crypto.randomBytes(Math.ceil(length / 2)).toString("hex").slice(0, length);
 }
 
-router.post("/create-inbox", async (req, res) => {
+
+router.post("/create-inbox", limiter , async (req, res) => {
   const emailId = generateRandomId();
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 

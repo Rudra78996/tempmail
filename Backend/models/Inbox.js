@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 
-const emailSchema = new mongoose.Schema({
-    from : String,
-    subject : String,
-    text : String,
-    html : String,
-    receivedAt : Date
+    const emailSchema = new mongoose.Schema({
+        from : String,
+        subject : String,
+        text : String,
+        html : String,
+        receivedAt : Date
 });
 
 const inboxSchema = new mongoose.Schema({
