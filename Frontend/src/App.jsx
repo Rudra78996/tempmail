@@ -129,14 +129,30 @@ export default function App() {
 
   useEffect(() => {
     if (!email || email === "Generating...") return;
-    socket.emit("join_inbox", email.split("@")[0]);
+    
+    const joinRoom = () => {
+      socket.emit("join_inbox", email.split("@")[0]);
+    };
 
-    socket.on("new_email", (data) => {
+    // Join immediately if already connected, otherwise wait for connection
+    if (socket.connected) {
+      joinRoom();
+    }
+    
+    // Re-join on every reconnect
+    socket.on("connect", joinRoom);
+
+    const handleNewEmail = (data) => {
       setMessages((prev) => [data.email, ...prev]);
       toast.success("New email received!");
-    });
+    };
 
-    return () => socket.off("new_email");
+    socket.on("new_email", handleNewEmail);
+
+    return () => {
+      socket.off("connect", joinRoom);
+      socket.off("new_email", handleNewEmail);
+    };
   }, [email]);
 
   useEffect(() => {
