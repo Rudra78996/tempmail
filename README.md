@@ -1,14 +1,14 @@
-# 📮 tempmails.today — Free Temporary Email Service
+# 📮 tempmail.rudrx.cloud — Free Temporary Email Service
 
 **No more spam. No more hassle. Just quick, clean, disposable email.**
 
-> 🔒 Keep your real inbox secure and anonymous using tempmails.today — a fast, free, and private temporary email generator.
+> 🔒 Keep your real inbox secure and anonymous using tempmail.rudrx.cloud — a fast, free, and private temporary email generator.
 
 ---
 
-## 🚀 What is tempmails.today?
+## 🚀 What is tempmail.rudrx.cloud?
 
-`tempmails.today` is a **free, anonymous, and disposable email address generator** built to protect your real inbox from:
+`tempmail.rudrx.cloud` is a **free, anonymous, and disposable email address generator** built to protect your real inbox from:
 
 * 📧 Spam & ads
 * 📰 Newsletters & promotions
@@ -53,7 +53,7 @@ A **temporary or disposable email** is a unique, time-limited email address you 
 
 ## 🌐 Try it Now
 
-👉 [Visit tempmails.today](https://tempmails.today)
+👉 [Visit tempmail.rudrx.cloud](https://tempmail.rudrx.cloud)
 Enjoy anonymous emails without the spam.
 
 ---

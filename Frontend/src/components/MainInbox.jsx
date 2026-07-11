@@ -2,14 +2,16 @@ import { useState } from "react";
 import DOMPurify from "dompurify";
 import {
   Inbox as InboxIcon,
-  ArrowLeft,
   Mail,
   Clock,
   User,
-  FileText,
   Mailbox,
-  Frown,
+  ChevronRight
 } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 const formatTime = (dateString) => {
   const date = new Date(dateString);
@@ -25,102 +27,128 @@ const formatTime = (dateString) => {
     hour12: true,
   }).format(date);
 };
-export const MainInbox = ({ messages }) => {
 
-  const [currentMessage, setCurrentMessage] = useState([]);
-  const handleClickMessage = (messageId) => {
-    setCurrentMessage(messages.filter((message) => message._id === messageId));
-  };
+export const MainInbox = ({ messages }) => {
+  const [currentMessageId, setCurrentMessageId] = useState(null);
+  
+  const currentMessage = messages.find(m => m._id === currentMessageId);
 
   return (
-    <div className="h-[600px] w-full max-w-6xl hidden md:flex border border-gray-200 rounded-lg overflow-hidden bg-white shadow-lg">
-      {/* Message List */}
-      <div className="w-2/5 border-r border-gray-200 flex flex-col">
-        <div className="p-4 border-b border-gray-200">
-          <div className="flex items-center">
-            <InboxIcon className="h-5 w-5 text-gray-600 mr-2" />
-            <h1 className="text-lg font-medium">Inbox ({messages.length})</h1>
+    <Card className="h-[600px] w-full max-w-6xl hidden md:flex border-border/50 bg-card/40 backdrop-blur-xl shadow-2xl overflow-hidden rounded-2xl">
+      {/* Sidebar - Message List */}
+      <div className="w-2/5 flex flex-col bg-background/50 border-r border-border/50 relative">
+        <div className="p-5 border-b border-border/50 bg-background/80 backdrop-blur-md sticky top-0 z-10 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg text-primary">
+              <InboxIcon className="h-5 w-5" />
+            </div>
+            <h2 className="text-lg font-semibold tracking-tight">Inbox</h2>
           </div>
+          <Badge variant="secondary" className="px-2.5 py-0.5 rounded-full font-medium">
+            {messages.length}
+          </Badge>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <ScrollArea className="flex-1">
           {messages.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-gray-500 p-6">
-              <Mailbox className="h-12 w-12 mb-3 text-gray-400" />
-              <p className="text-lg">No messages yet</p>
+            <div className="h-[400px] flex flex-col items-center justify-center text-muted-foreground p-6 text-center animate-in fade-in duration-500">
+              <div className="h-16 w-16 bg-secondary/50 rounded-full flex items-center justify-center mb-4">
+                <Mailbox className="h-8 w-8 text-muted-foreground/60" />
+              </div>
+              <p className="text-lg font-medium text-foreground">Inbox is empty</p>
+              <p className="text-sm mt-1">Waiting for incoming emails...</p>
             </div>
           ) : (
-            messages.map((message) => (
-              <div
-                key={message._id}
-                className={`p-4 border-b border-gray-100 cursor-pointer ${
-                  currentMessage[0]?._id === message._id
-                    ? "bg-gray-100"
-                    : "hover:bg-gray-50"
-                }`}
-                onClick={() => handleClickMessage(message._id)}
-              >
-                <div className="flex justify-between items-start mb-1">
-                  <span className="font-medium text-gray-900 truncate">
-                    {message.from}
-                  </span>
-                  <span className="text-sm text-gray-500">
-                    {formatTime(message.receivedAt)}
-                  </span>
-                </div>
-                <p className="font-medium text-gray-800 mb-1 truncate">
-                  {message.subject}
-                </p>
-                <p className="text-sm text-gray-500 truncate">
-                  {message.text?.slice(0, 70) || "No text content"}...
-                </p>
-              </div>
-            ))
+            <div className="p-3 flex flex-col gap-2">
+              {messages.map((message) => {
+                const isActive = currentMessageId === message._id;
+                return (
+                  <div
+                    key={message._id}
+                    onClick={() => setCurrentMessageId(message._id)}
+                    className={`group p-4 rounded-xl cursor-pointer transition-all duration-200 border ${
+                      isActive
+                        ? "bg-primary text-primary-foreground border-primary shadow-md shadow-primary/20"
+                        : "bg-card hover:bg-secondary border-border/50 hover:border-border"
+                    }`}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <span className={`font-semibold truncate pr-4 ${isActive ? "text-primary-foreground" : "text-foreground"}`}>
+                        {message.from}
+                      </span>
+                      <span className={`text-xs whitespace-nowrap pt-1 ${isActive ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                        {formatTime(message.receivedAt)}
+                      </span>
+                    </div>
+                    <p className={`font-medium mb-1 truncate text-sm ${isActive ? "text-primary-foreground/90" : "text-foreground/90"}`}>
+                      {message.subject || "(No Subject)"}
+                    </p>
+                    <p className={`text-sm truncate ${isActive ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+                      {message.text?.slice(0, 80) || "No text content"}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
           )}
-        </div>
+        </ScrollArea>
       </div>
 
-      {/* Message View */}
-      <div className="w-3/5 flex flex-col">
-        {currentMessage.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center text-gray-500 p-6 mt-14">
-            <Mail className="h-12 w-12 mb-3 text-gray-400" />
-            <p className="text-lg">Select a message</p>
+      {/* Main Content - Message View */}
+      <div className="w-3/5 flex flex-col bg-card/30 relative">
+        {!currentMessage ? (
+          <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 text-center bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent">
+            <div className="h-20 w-20 bg-background rounded-2xl shadow-xl shadow-primary/5 border border-border/50 flex items-center justify-center mb-6 animate-pulse">
+              <Mail className="h-10 w-10 text-primary/40" />
+            </div>
+            <p className="text-xl font-medium text-foreground">Select an email to read</p>
+            <p className="text-sm mt-2 max-w-sm">
+              Click on any email from the list on the left to view its full contents here.
+            </p>
           </div>
         ) : (
-          currentMessage.map((message) => (
-            <div key={message._id} className="flex-1 overflow-y-auto p-6">
-              <h2 className="text-xl font-medium text-gray-900 mb-4">
-                {message.subject}
+          <div className="flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="p-8 border-b border-border/50 bg-background/40">
+              <h2 className="text-2xl font-bold text-foreground mb-6 leading-tight">
+                {currentMessage.subject || "(No Subject)"}
               </h2>
 
-              <div className="flex items-center text-sm text-gray-600 mb-6">
-                <User className="h-4 w-4 mr-1 text-gray-500" />
-                <span className="font-medium mr-2">From:</span>
-                <span className="mr-4">{message.from}</span>
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center text-sm text-foreground/80 bg-background/50 p-3 rounded-lg border border-border/50">
+                  <User className="h-4 w-4 mr-3 text-primary" />
+                  <span className="font-medium mr-2 text-foreground">From:</span>
+                  <span className="truncate">{currentMessage.from}</span>
+                </div>
 
-                <Clock className="h-4 w-4 mr-1 text-gray-500" />
-                <span>{formatTime(message.receivedAt)}</span>
+                <div className="flex items-center text-sm text-foreground/80 bg-background/50 p-3 rounded-lg border border-border/50 w-fit">
+                  <Clock className="h-4 w-4 mr-3 text-primary" />
+                  <span className="font-medium mr-2 text-foreground">Received:</span>
+                  <span>{new Date(currentMessage.receivedAt).toLocaleString()}</span>
+                </div>
               </div>
+            </div>
 
-              <div className="prose max-w-none">
-                {message.html ? (
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: DOMPurify.sanitize(message.html),
-                    }}
-                    className="email-content"
-                  />
+            <ScrollArea className="flex-1">
+              <div className="p-8">
+                {currentMessage.html ? (
+                  <div className="bg-white text-black p-6 rounded-xl border shadow-inner overflow-x-auto email-content-wrapper">
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(currentMessage.html),
+                      }}
+                      className="email-content prose max-w-none prose-sm"
+                    />
+                  </div>
                 ) : (
-                  <div className="whitespace-pre-line text-gray-800">
-                    {message.text}
+                  <div className="bg-background/50 border border-border/50 p-6 rounded-xl whitespace-pre-wrap text-foreground/90 font-mono text-sm shadow-inner">
+                    {currentMessage.text}
                   </div>
                 )}
               </div>
-            </div>
-          ))
+            </ScrollArea>
+          </div>
         )}
       </div>
-    </div>
+    </Card>
   );
 };
